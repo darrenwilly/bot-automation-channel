@@ -1,0 +1,36 @@
+{
+  "name": "bot-automation-channel",
+  "description": "Bot Channel Automation platform",
+  "type": "project",
+  "homepage": "https://bot-automation.darviews.com",
+  "license": "Commercial",
+  "keywords": [
+    "darviews",
+    "sms",
+    "office report tools",
+    "integration" ,
+    "2waysms",
+    "sms",
+    "messenger",
+    "ivr"
+  ],
+  "config": {
+    "sort-packages": true,
+    "process-timeout":0
+  },
+  "support": {
+    "issues": "https://support.darviews.com"
+  },
+  "require": {
+      "php": "^7.2",
+      "darviews/dv-bundle": "^3.0",
+      "darviews/dv-microservice": "^3.0"
+  },
+  "autoload": {
+      "psr-4": {
+        "Veiw\\BotLogic\\": "/"
+      }
+  },
+  "scripts": {
+  }
+}
