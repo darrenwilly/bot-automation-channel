@@ -1,9 +1,9 @@
 {
-  "name": "bot-automation-channel",
-  "description": "Bot Channel Automation platform",
+  "name": "darviews/bot-automation-channel",
+  "description": "Value Added Service channel robot automation framework for Shortcode, USSD, Whatsapp, Telegram, Facebook Messenger e.t.c",
   "type": "project",
-  "homepage": "https://bot-automation.darviews.com",
-  "license": "Commercial",
+  "homepage": "https://github.com/darrenwilly/bot-automation-channel",
+  "license": "MIT",
   "keywords": [
     "darviews",
     "sms",
@@ -23,7 +23,7 @@
   },
   "require": {
       "php": "^7.2",
-      "darviews/dv-bundle": "^3.0",
+      "darviews/dv-core": "^3.0",
       "darviews/dv-microservice": "^3.0"
   },
   "autoload": {
