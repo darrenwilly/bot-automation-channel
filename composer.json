@@ -23,7 +23,7 @@
   },
   "require": {
       "php": "^7.2",
-      "darviews/dv-core": "^3.0",
+      "darviews/dv-core": "^3.0.1",
       "darviews/dv-microservice": "^3.0"
   },
   "autoload": {
