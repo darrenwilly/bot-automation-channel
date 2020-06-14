@@ -1,7 +1,6 @@
 <?php
 namespace Veiw\BotLogic\Core\EventSubscriber\BotCollateKeyword;
 
-use DV\ContainerService\ServiceLocatorFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Veiw\BotLogic\Core\Event\BotCollateKeywordEvent;
@@ -14,6 +13,7 @@ class LocateKeywordFromContentSubscriber implements EventSubscriberInterface
 {
 
     protected $container ;
+    protected $keywordAggregator ;
 
     static public function getSubscribedEvents()
     {
@@ -24,9 +24,9 @@ class LocateKeywordFromContentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(KeywordRouteAggregator $keywordAggregator)
     {
-        $this->container = $container ;
+        $this->keywordAggregator = $keywordAggregator ;
     }
 
     public function locateKeywordFromExtractedContext(BotCollateKeywordEvent $collateKeywordEvent , $eventName , EventDispatcherInterface $dispatcher)
@@ -41,14 +41,14 @@ class LocateKeywordFromContentSubscriber implements EventSubscriberInterface
         $spChannelAdapterOptions = $requestEvent->getChannel() ;
 
         ##
-        $keywordRouteAggregator = $this->container->get(KeywordRouteAggregator::class) ;
+        $keywordRouteAggregator = $this->keywordAggregator;
 
         ## fetch indexd from keyword
         $keywordRouteAggregator->collateRouteAsRouter();
         $keywordRouteAggregator->setKeyword($collateKeywordEvent->getContent());
         ##
         $routeMatch = $keywordRouteAggregator->match() ;
-
+        #dump($routeMatch);exit;
         $routeMatch = (array) $keywordRouteAggregator->getRouteMatch() ;
 
         if(isset($routeMatch['target']))    {

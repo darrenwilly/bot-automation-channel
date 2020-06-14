@@ -19,6 +19,8 @@ class ExecuteKeywordTargetSubscriber implements EventSubscriberInterface
 {
     use TraitContainer;
 
+    const DEFAULT_METHOD_TO_CALL = 'dispatch' ;
+
     static public function getSubscribedEvents()
     {
         return [
@@ -43,7 +45,12 @@ class ExecuteKeywordTargetSubscriber implements EventSubscriberInterface
         $logicresult = new LogicResult() ;
         $logicresult->setEvent($keywordEvent);
 
-        ##
+        ## set the default method to call
+        $method_to_call = static::DEFAULT_METHOD_TO_CALL ;
+
+        /**
+         * Since the major callback to set for each route is string, so we decided to test for it first
+         */
         if(is_string($keywordTarget) && (! class_exists($keywordTarget)) )    {
             ##
             $invalidKeyword = new InvalidKeywordResponse() ;
@@ -56,6 +63,17 @@ class ExecuteKeywordTargetSubscriber implements EventSubscriberInterface
             return new LogicResultResponse($logicresult) ;
         }
         else{
+
+            /**
+             * This solve the issue when the callback set for Keyword Route is a call back
+             */
+            if(is_callable($keywordTarget) && is_array($keywordTarget))    {
+                ##
+                $class_to_call = $keywordTarget[0] ;
+                $method_to_call = $keywordTarget[1] ;
+                ##
+                $keywordTarget = $class_to_call ;
+            }
 
             ## check if container has the TargetKeywordHanlder
             if(! $container->has($keywordTarget))    {
@@ -72,13 +90,7 @@ class ExecuteKeywordTargetSubscriber implements EventSubscriberInterface
 
             ## get the target as a container service for dependencies injection
             $keywordTarget = $container->get($keywordTarget) ;
-
-
         }
-
-       /* if(! is_callable($keywordTarget))    {
-            throw new \RuntimeException('A callable object or class is required as option for Keyword target') ;
-        }*/
 
         /**
          * check for AbstractKeywordDispather object
@@ -91,13 +103,25 @@ class ExecuteKeywordTargetSubscriber implements EventSubscriberInterface
         /**
          * when the KeywordTarget Handler is just an Invokable class or object
          */
-        if (! method_exists($keywordTarget , 'dispatch')) {
+        if (! method_exists($keywordTarget , $method_to_call) && method_exists($keywordTarget , '__invoke')) {
             ##
             $result_from_keyword_handler = $keywordTarget($keywordEvent) ;
         }
         else{
+            /**
+             * Solve the issue with Static method call for Keyword Targets
+             */
+            $reflector = new \ReflectionMethod($keywordTarget, $method_to_call);
+
             ##
-            $result_from_keyword_handler = $keywordTarget->dispatch($keywordEvent);
+            if($reflector->isStatic()) {
+                ##
+                $result_from_keyword_handler = call_user_func([$keywordTarget , $method_to_call] , $keywordEvent) ;
+            }
+            else{
+                ##
+                $result_from_keyword_handler = $keywordTarget->{$method_to_call}($keywordEvent);
+            }
         }
 
         ##
